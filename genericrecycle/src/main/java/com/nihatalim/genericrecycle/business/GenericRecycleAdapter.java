@@ -1,12 +1,19 @@
 package com.nihatalim.genericrecycle.business;
 
 import android.content.Context;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
 import com.nihatalim.genericrecycle.interfaces.OnBind;
+import com.nihatalim.genericrecycle.interfaces.OnClick;
 import com.nihatalim.genericrecycle.interfaces.OnCreate;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -28,8 +35,15 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     private OnBind<THolder> OnBindInterface = null;
 
+    private LinearLayoutManager LayoutManager;
+
     // CONSTRUCTORS
-    public GenericRecycleAdapter() {}
+    public GenericRecycleAdapter() {
+        this.LayoutManager = new LinearLayoutManager(this.context);
+        this.LayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        this.LayoutManager.scrollToPosition(0);
+
+    }
 
     public GenericRecycleAdapter(List<TListObject> objectList, Context context) {
         this();
@@ -57,6 +71,15 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
     @Override
     public int getItemCount() {
         return this.objectList.size();
+    }
+
+    // BUILD RECYCLEVIEW
+
+    public void build(RecyclerView recyclerView){
+        recyclerView.setLayoutManager(this.LayoutManager);
+        recyclerView.setAdapter(this);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
     }
 
     // GETTERS AND SETTERS
@@ -98,5 +121,13 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     public void setOnBindInterface(OnBind<THolder> onBindInterface) {
         OnBindInterface = onBindInterface;
+    }
+
+    public LinearLayoutManager getLayoutManager() {
+        return LayoutManager;
+    }
+
+    public void setLayoutManager(LinearLayoutManager layoutManager) {
+        LayoutManager = layoutManager;
     }
 }
