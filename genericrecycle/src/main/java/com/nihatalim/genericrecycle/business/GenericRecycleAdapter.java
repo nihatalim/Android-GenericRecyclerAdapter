@@ -1,19 +1,21 @@
 package com.nihatalim.genericrecycle.business;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import com.nihatalim.genericrecycle.interfaces.OnBind;
-import com.nihatalim.genericrecycle.interfaces.OnClick;
-import com.nihatalim.genericrecycle.interfaces.OnCreate;
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
-import java.lang.reflect.InvocationTargetException;
+import com.nihatalim.genericrecycle.interfaces.ItemFeeder;
+import com.nihatalim.genericrecycle.interfaces.OnAdapter;
+
 import java.util.List;
 
 /**
@@ -30,19 +32,24 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
     // This is name of a layout xml file.
     private int layout_element;
 
-    //Interfaces( needs to setters )
-    private OnCreate<THolder> OnCreateInterface = null;
-
-    private OnBind<THolder> OnBindInterface = null;
+    private OnAdapter<THolder> OnAdapter = null;
 
     private LinearLayoutManager LayoutManager;
+
+    private int paginationSize = 0;
+
+    private ItemFeeder<TListObject> ItemFeeder = null;
+
+    private boolean isLoading = false;
+
+    // You can set techniques on setter method but this is default animation
+    private Techniques techniques = Techniques.Bounce;
 
     // CONSTRUCTORS
     public GenericRecycleAdapter() {
         this.LayoutManager = new LinearLayoutManager(this.context);
         this.LayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         this.LayoutManager.scrollToPosition(0);
-
     }
 
     public GenericRecycleAdapter(List<TListObject> objectList, Context context) {
@@ -56,31 +63,70 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         this.setLayout_element(layout_element);
     }
 
-    // IMPLEMENTED METHODS
     @Override
     public THolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(this.layout_element,parent,false);
-        return this.OnCreateInterface.onCreate(parent,viewType,view);
+        //return this.OnCreateInterface.onCreate(parent,viewType,view);
+        return this.OnAdapter.onCreate(parent,viewType,view);
     }
 
     @Override
     public void onBindViewHolder(THolder holder, int position) {
-        this.OnBindInterface.OnBind(holder,position);
+        //this.OnBindInterface.OnBind(holder,position);
+        this.OnAdapter.OnBind(holder, position);
     }
 
     @Override
     public int getItemCount() {
+        if(this.objectList==null) return 0;
         return this.objectList.size();
     }
 
     // BUILD RECYCLEVIEW
 
     public void build(RecyclerView recyclerView){
-        recyclerView.setLayoutManager(this.LayoutManager);
+        // Added for fragments if this LM is not binded already
+        try {
+            recyclerView.setLayoutManager(this.LayoutManager);
+        }catch (Exception ex){
+            Log.e("GenericRecyclerAdapter", "recyclerView.setLayoutManager throws an error: " + ex.getMessage());
+        }
         recyclerView.setAdapter(this);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
+
+        if(this.paginationSize>0){
+            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if(!isLoading){
+                        if(objectList.size() <= 0 || objectList.size() % paginationSize != 0  || LayoutManager.findLastVisibleItemPosition()!= objectList.size()-1) return;
+
+                        TListObject obj = objectList.get(LayoutManager.findLastVisibleItemPosition());
+                        if(obj != null){
+                            isLoading = true;
+                            YoYo.with(techniques).duration(1000).playOn(recyclerView);
+                            objectList.addAll(ItemFeeder.feedItems(paginationSize, getPaginationOrder(), obj));
+                            isLoading = false;
+                            ((Activity) context).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+        }
     }
+
 
     // GETTERS AND SETTERS
     public List<TListObject> getObjectList() {
@@ -107,20 +153,44 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         this.layout_element = layout_element;
     }
 
-    public OnCreate<THolder> getOnCreateInterface() {
-        return OnCreateInterface;
+    public com.nihatalim.genericrecycle.interfaces.OnAdapter<THolder> getOnAdapter() {
+        return OnAdapter;
     }
 
-    public void setOnCreateInterface(OnCreate<THolder> onCreateInterface) {
-        OnCreateInterface = onCreateInterface;
+    public void setOnAdapter(com.nihatalim.genericrecycle.interfaces.OnAdapter<THolder> onAdapter) {
+        OnAdapter = onAdapter;
     }
 
-    public OnBind<THolder> getOnBindInterface() {
-        return OnBindInterface;
+    public com.nihatalim.genericrecycle.interfaces.ItemFeeder<TListObject> getItemFeeder() {
+        return ItemFeeder;
     }
 
-    public void setOnBindInterface(OnBind<THolder> onBindInterface) {
-        OnBindInterface = onBindInterface;
+    public void setItemFeeder(com.nihatalim.genericrecycle.interfaces.ItemFeeder<TListObject> itemFeeder) {
+        ItemFeeder = itemFeeder;
+    }
+
+    public int getPaginationSize() {
+        return paginationSize;
+    }
+
+    public void setPaginationSize(int paginationSize) {
+        this.paginationSize = paginationSize;
+    }
+
+    public int getPaginationOrder() {
+        return objectList.size() / paginationSize;
+    }
+
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public Techniques getTechniques() {
+        return techniques;
+    }
+
+    public void setTechniques(Techniques techniques) {
+        this.techniques = techniques;
     }
 
     public LinearLayoutManager getLayoutManager() {
