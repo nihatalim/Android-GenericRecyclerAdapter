@@ -53,6 +53,11 @@ public class MainActivity extends AppCompatActivity {
                 userHolder.name.setText(adapter.getObjectList().get(position).getName());
                 userHolder.date.setText(dateFormat.format(adapter.getObjectList().get(position).getDate()));
             }
+
+            @Override
+            public RecyclerView.LayoutManager setLayoutManager(RecyclerView.LayoutManager defaultLayoutManager) {
+                return defaultLayoutManager;
+            }
         });
 
         adapter.setPaginationSize(PAGINATION_SIZE);

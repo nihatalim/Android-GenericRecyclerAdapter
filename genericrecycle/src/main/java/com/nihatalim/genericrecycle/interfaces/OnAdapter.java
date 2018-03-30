@@ -1,5 +1,6 @@
 package com.nihatalim.genericrecycle.interfaces;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -10,5 +11,5 @@ import android.view.ViewGroup;
 public interface OnAdapter<THolder> {
     THolder onCreate(ViewGroup parent, int viewType, View view);
     void OnBind(THolder holder, int position);
-
+    RecyclerView.LayoutManager setLayoutManager(RecyclerView.LayoutManager defaultLayoutManager);
 }

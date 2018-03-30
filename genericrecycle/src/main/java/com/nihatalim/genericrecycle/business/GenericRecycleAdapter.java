@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -34,9 +35,9 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     private OnAdapter<THolder> OnAdapter = null;
 
-    private LinearLayoutManager LayoutManager;
-
     private int paginationSize = 0;
+
+    public RecyclerView.LayoutManager LayoutManager = null;
 
     private ItemFeeder<TListObject> ItemFeeder = null;
 
@@ -47,9 +48,7 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     // CONSTRUCTORS
     public GenericRecycleAdapter() {
-        this.LayoutManager = new LinearLayoutManager(this.context);
-        this.LayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        this.LayoutManager.scrollToPosition(0);
+
     }
 
     public GenericRecycleAdapter(List<TListObject> objectList, Context context) {
@@ -86,11 +85,11 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     public void build(RecyclerView recyclerView){
         // Added for fragments if this LM is not binded already
-        try {
-            recyclerView.setLayoutManager(this.LayoutManager);
-        }catch (Exception ex){
-            Log.e("GenericRecyclerAdapter", "recyclerView.setLayoutManager throws an error: " + ex.getMessage());
-        }
+        this.LayoutManager = OnAdapter.setLayoutManager(getDefaultLayoutManager());
+        if(this.LayoutManager == null) this.LayoutManager = getDefaultLayoutManager();
+
+        recyclerView.setLayoutManager(this.LayoutManager);
+
         recyclerView.setAdapter(this);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
@@ -106,9 +105,9 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
                     if(!isLoading){
-                        if(objectList.size() <= 0 || objectList.size() % paginationSize != 0  || LayoutManager.findLastVisibleItemPosition()!= objectList.size()-1) return;
+                        if(objectList.size() <= 0 || objectList.size() % paginationSize != 0  || ((LinearLayoutManager)LayoutManager).findLastVisibleItemPosition()!= objectList.size()-1) return;
 
-                        TListObject obj = objectList.get(LayoutManager.findLastVisibleItemPosition());
+                        TListObject obj = objectList.get(((LinearLayoutManager)LayoutManager).findLastVisibleItemPosition());
                         if(obj != null){
                             isLoading = true;
                             YoYo.with(techniques).duration(1000).playOn(recyclerView);
@@ -193,11 +192,11 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         this.techniques = techniques;
     }
 
-    public LinearLayoutManager getLayoutManager() {
-        return LayoutManager;
+    public LinearLayoutManager getDefaultLayoutManager() {
+        LinearLayoutManager defaultLayoutManager = new LinearLayoutManager(this.context);
+        defaultLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        defaultLayoutManager.scrollToPosition(0);
+        return defaultLayoutManager;
     }
 
-    public void setLayoutManager(LinearLayoutManager layoutManager) {
-        LayoutManager = layoutManager;
-    }
 }
