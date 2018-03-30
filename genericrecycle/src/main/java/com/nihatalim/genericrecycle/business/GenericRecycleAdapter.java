@@ -192,6 +192,14 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         this.techniques = techniques;
     }
 
+    public RecyclerView.LayoutManager getLayoutManager() {
+        return LayoutManager;
+    }
+
+    public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        LayoutManager = layoutManager;
+    }
+
     public LinearLayoutManager getDefaultLayoutManager() {
         LinearLayoutManager defaultLayoutManager = new LinearLayoutManager(this.context);
         defaultLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
