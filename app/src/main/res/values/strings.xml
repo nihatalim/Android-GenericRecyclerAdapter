@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">GenericRecycler</string>
+
+    <string name="activity_verticalrecycler">VERTICAL RECYCLER</string>
+    <string name="activity_horizontalrecycler">HORIZONTAL RECYCLER</string>
+    <string name="activity_gridrecycler">GRID RECYCLER</string>
+    <string name="activity_staggeredgridrecycler">STAGGERED GRID RECYCLER</string>
+
 </resources>

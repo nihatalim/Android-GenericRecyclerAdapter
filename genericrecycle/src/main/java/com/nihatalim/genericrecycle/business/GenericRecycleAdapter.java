@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +16,6 @@ import android.widget.LinearLayout;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
-import com.nihatalim.genericrecycle.interfaces.ItemFeeder;
 import com.nihatalim.genericrecycle.interfaces.OnAdapter;
 
 import java.util.List;
@@ -35,13 +36,11 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     private OnAdapter<THolder> OnAdapter = null;
 
-    private int paginationSize = 0;
-
     public RecyclerView.LayoutManager LayoutManager = null;
 
-    private ItemFeeder<TListObject> ItemFeeder = null;
-
     private boolean isLoading = false;
+
+    private boolean isSnap = false;
 
     // You can set techniques on setter method but this is default animation
     private Techniques techniques = Techniques.Bounce;
@@ -81,6 +80,10 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         return this.objectList.size();
     }
 
+    public void snap(boolean snp){
+        this.isSnap = snp;
+    }
+
     // BUILD RECYCLEVIEW
 
     public void build(RecyclerView recyclerView){
@@ -94,35 +97,9 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
 
-        if(this.paginationSize>0){
-            recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                    super.onScrollStateChanged(recyclerView, newState);
-                }
-
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    if(!isLoading){
-                        if(objectList.size() <= 0 || objectList.size() % paginationSize != 0  || ((LinearLayoutManager)LayoutManager).findLastVisibleItemPosition()!= objectList.size()-1) return;
-
-                        TListObject obj = objectList.get(((LinearLayoutManager)LayoutManager).findLastVisibleItemPosition());
-                        if(obj != null){
-                            isLoading = true;
-                            YoYo.with(techniques).duration(1000).playOn(recyclerView);
-                            objectList.addAll(ItemFeeder.feedItems(paginationSize, getPaginationOrder(), obj));
-                            isLoading = false;
-                            ((Activity) context).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    }
-                }
-            });
+        if(this.isSnap){
+            SnapHelper snapHelper = new PagerSnapHelper();
+            snapHelper.attachToRecyclerView(recyclerView);
         }
     }
 
@@ -158,26 +135,6 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     public void setOnAdapter(com.nihatalim.genericrecycle.interfaces.OnAdapter<THolder> onAdapter) {
         OnAdapter = onAdapter;
-    }
-
-    public com.nihatalim.genericrecycle.interfaces.ItemFeeder<TListObject> getItemFeeder() {
-        return ItemFeeder;
-    }
-
-    public void setItemFeeder(com.nihatalim.genericrecycle.interfaces.ItemFeeder<TListObject> itemFeeder) {
-        ItemFeeder = itemFeeder;
-    }
-
-    public int getPaginationSize() {
-        return paginationSize;
-    }
-
-    public void setPaginationSize(int paginationSize) {
-        this.paginationSize = paginationSize;
-    }
-
-    public int getPaginationOrder() {
-        return objectList.size() / paginationSize;
     }
 
     public boolean isLoading() {

@@ -9,12 +9,34 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".activities.HorizontalRecycler">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nihatalim.genericrecycler.activities.MainActivity" />
+        </activity>
+
+        <activity android:name=".activities.VerticalRecycler">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nihatalim.genericrecycler.activities.MainActivity" />
+        </activity>
+        <activity android:name=".activities.GridRecycler">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nihatalim.genericrecycler.activities.MainActivity" />
+        </activity>
+        <activity android:name=".activities.StaggeredGridRecycler" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nihatalim.genericrecycler.activities.MainActivity" />
         </activity>
     </application>
 

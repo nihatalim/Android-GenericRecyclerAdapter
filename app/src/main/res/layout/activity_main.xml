@@ -4,13 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="5dp"
+    android:orientation="vertical"
     tools:context="com.nihatalim.genericrecycler.activities.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:scrollbars="vertical"
+    <Button
+        android:id="@+id/btnVertical"
+        android:text="@string/activity_verticalrecycler"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="50dp" />
+
+    <Button
+        android:id="@+id/btnHorizontal"
+        android:text="@string/activity_horizontalrecycler"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <Button
+        android:id="@+id/btnGrid"
+        android:text="@string/activity_gridrecycler"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
+    <Button
+        android:id="@+id/btnStaggeredGrid"
+        android:text="@string/activity_staggeredgridrecycler"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
 
 </LinearLayout>
