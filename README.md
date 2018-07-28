@@ -8,11 +8,24 @@ There is below example in this repository in app module
 
 # Step 1: Installation
 
-Click this button
-[![](https://jitpack.io/v/nihatalim/DragList.svg)](https://jitpack.io/#nihatalim/genericrecycler)
+## a) Add it in your root build.gradle at the end of repositories
 
-In the opening page, click the GET button which latest version.
-Then follow the instruction.
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+## b) Add the dependency
+
+```
+dependencies {
+    implementation 'com.github.nihatalim:genericrecycler:v1.0.8'
+}
+```
 
 # Step 2: Usage
 
@@ -87,8 +100,40 @@ adapter.setOnAdapter(new OnAdapter<UserHolder>() {
 adapter.snap(true);
 ```
 
+## e) Add pagination base
 
-## e) Finally build the adapter 
+```
+// You can set the pageNumber for initializing. This is default value.
+adapter.pageNumber = 1;
+
+// You can set pagination size. This is default value.
+adapter.paginationSize = 10;
+
+// You can set pagination time limit as ms (1 sec = 1000 ms). May be useful for some stuff like getting data from servers etc. This is default value.
+adapter.paginationTimeLimit = 1000;
+
+adapter.setOnPaginate(new OnPaginate<User>() {
+    @Override
+    public void paginate(int nextPageNumber, int paginationSize, User firstItem, User lastItem, Bundle bundle) {
+        // Write your pagination logic.
+        if(nextPageNumber>0){
+            List<User> list = getSubListForPage(userList, nextPageNumber, paginationSize);
+            if(list.size()>0){
+                adapter.clear(true); // Clear all items and pass true parameter for notifyDatasetChange
+                adapter.addAll(list, true); // Add the list and pass true parameter for notifyDatasetChange
+                adapter.pageNumber = nextPageNumber; // Update adapter's pageNumber
+            }
+        }
+    }
+});
+
+// You can call paginate function for calling paginate logic. First param is int variable for next page number and you can determine before calling. Second param is a bundle object for passing your custom params.
+adapter.paginate(requestedPage, null);
+
+```
+
+
+## f) Finally build the adapter 
 
 ```
 adapter.build(this.recyclerView);
