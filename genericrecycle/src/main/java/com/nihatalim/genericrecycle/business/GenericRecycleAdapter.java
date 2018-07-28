@@ -2,6 +2,7 @@ package com.nihatalim.genericrecycle.business;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
@@ -17,7 +18,9 @@ import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 
 import com.nihatalim.genericrecycle.interfaces.OnAdapter;
+import com.nihatalim.genericrecycle.interfaces.OnPaginate;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +39,15 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     private OnAdapter<THolder> OnAdapter = null;
 
+    private OnPaginate OnPaginate = null;
+
     public RecyclerView.LayoutManager LayoutManager = null;
+
+    public Date LastPaginationTime = new Date();
+
+    public int pageNumber = 1;
+    public int paginationSize = 10;
+    public long paginationTimeLimit = 1000;
 
     private boolean isLoading = false;
 
@@ -103,6 +114,46 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
         }
     }
 
+    public void add(TListObject obj, boolean notify){
+        if(this.objectList!=null){
+            this.objectList.add(obj);
+            if(notify) this.notifyDataSetChanged();
+        }
+    }
+
+    public void addAll(List<TListObject> obj, boolean notify){
+        if(this.objectList!=null){
+            this.objectList.addAll(obj);
+            if(notify) this.notifyDataSetChanged();
+        }
+    }
+
+    public void remove(TListObject obj, boolean notify){
+        this.objectList.remove(obj);
+        if (notify) this.notifyDataSetChanged();
+    }
+
+    public void clear(boolean notify){
+        this.objectList.clear();
+        if (notify) this.notifyDataSetChanged();
+    }
+
+    public void paginate(int pageNumber, Bundle bundle){
+        TListObject firstItem = null;
+        TListObject lastItem = null;
+
+        Date nextTime = new Date(this.LastPaginationTime.getTime() + this.paginationTimeLimit);
+        Date currentTime = new Date();
+
+        if(nextTime.before(currentTime)){
+            if(this.objectList.size()>0){
+                firstItem = this.objectList.get(0);
+                lastItem = this.objectList.get(this.objectList.size()-1);
+            }
+            this.OnPaginate.<TListObject>paginate(pageNumber, this.paginationSize, firstItem, lastItem, bundle);
+            LastPaginationTime = currentTime;
+        }
+    }
 
     // GETTERS AND SETTERS
     public List<TListObject> getObjectList() {
@@ -135,6 +186,14 @@ public class GenericRecycleAdapter<THolder extends RecyclerView.ViewHolder, TLis
 
     public void setOnAdapter(com.nihatalim.genericrecycle.interfaces.OnAdapter<THolder> onAdapter) {
         OnAdapter = onAdapter;
+    }
+
+    public com.nihatalim.genericrecycle.interfaces.OnPaginate getOnPaginate() {
+        return OnPaginate;
+    }
+
+    public void setOnPaginate(com.nihatalim.genericrecycle.interfaces.OnPaginate onPaginate) {
+        OnPaginate = onPaginate;
     }
 
     public boolean isLoading() {

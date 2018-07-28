@@ -12,7 +12,7 @@ import com.nihatalim.genericrecycler.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private Button btnVertical, btnHorizontal, btnGrid, btnStaggeredGrid;
+    private Button btnVertical, btnHorizontal, btnGrid, btnStaggeredGrid, btnPaginationVertical;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,10 +23,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         this.btnHorizontal = findViewById(R.id.btnHorizontal);
         this.btnGrid = findViewById(R.id.btnGrid);
         this.btnStaggeredGrid = findViewById(R.id.btnStaggeredGrid);
+        this.btnPaginationVertical = findViewById(R.id.btnPaginationVertical);
+
         this.btnHorizontal.setOnClickListener(this);
         this.btnVertical.setOnClickListener(this);
         this.btnGrid.setOnClickListener(this);
         this.btnStaggeredGrid.setOnClickListener(this);
+        this.btnPaginationVertical.setOnClickListener(this);
+
     }
 
     private Context getContext(){
@@ -50,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btnStaggeredGrid:
                 startActivity(new Intent(this, StaggeredGridRecycler.class));
+                break;
+            case R.id.btnPaginationVertical:
+                startActivity(new Intent(this, PaginationRecycler.class));
+
                 break;
         }
     }

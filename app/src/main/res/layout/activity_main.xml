@@ -32,4 +32,10 @@
         android:layout_width="match_parent"
         android:layout_height="50dp" />
 
+    <Button
+        android:id="@+id/btnPaginationVertical"
+        android:text="@string/activity_paginationrecycler"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+
 </LinearLayout>

@@ -5,5 +5,9 @@
     <string name="activity_horizontalrecycler">HORIZONTAL RECYCLER</string>
     <string name="activity_gridrecycler">GRID RECYCLER</string>
     <string name="activity_staggeredgridrecycler">STAGGERED GRID RECYCLER</string>
+    <string name="activity_paginationrecycler">PAGINATION RECYCLER</string>
+
+    <string name="left">LEFT</string>
+    <string name="right">RIGHT</string>
 
 </resources>
